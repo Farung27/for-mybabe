@@ -1,1 +1,367 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our 5-Month Anniversary Quest 🎮</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset & Main Styles */
+        * { box-sizing: border-box; }
+        body {
+            background-color: #0c0c12;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            overflow-x: hidden;
+        }
 
+        h1, h2, h3 { color: #ff3e3e; text-shadow: 3px 3px #000; }
+        p { font-size: 0.7rem; line-height: 1.8; color: #ccc; }
+
+        /* โครงสร้างกล่องเกมย้อนยุค */
+        .game-box {
+            border: 4px solid #fff;
+            padding: 20px;
+            background-color: #000;
+            box-shadow: 0 0 0 4px #000, 0 0 0 8px #fff;
+            max-width: 550px;
+            width: 90%;
+            margin: 40px auto;
+            position: relative;
+        }
+
+        /* ปุ่มกดสไตล์มินิมอลพิกเซล */
+        .btn-pixel {
+            background-color: #ffcc00;
+            color: #000;
+            border: none;
+            padding: 15px 20px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: -4px 0 0 0 #000, 4px 0 0 0 #000, 0 -4px 0 0 #000, 0 4px 0 0 #000;
+            margin: 15px 0;
+            display: inline-block;
+        }
+        .btn-pixel:active { transform: translate(2px, 2px); }
+
+        /* อนิเมชั่นหัวใจลอยในหน้าแรก */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(1); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+        }
+        .heart-bg {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 0; overflow: hidden;
+        }
+        .pixel-heart {
+            position: absolute; color: #ff3e3e; font-size: 1.5rem;
+            animation: floatUp 6s linear infinite; opacity: 0;
+        }
+
+        /* โมเดลตัวละครพิกเซลดุ๊กดิ๊ก (Idle Animation) */
+        @keyframes idle {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes kneel {
+            0%, 100% { transform: translateY(15px) scaleY(0.7); }
+        }
+        .pixel-avatar {
+            width: 70px; height: 100px; margin: 0 auto; position: relative;
+            animation: idle 0.6s infinite ease-in-out;
+        }
+        .p1-animation { animation-delay: 0.2s; }
+        .pixel-part { position: absolute; }
+        .char-head { width: 44px; height: 44px; top: 16px; left: 13px; box-shadow: inset 0 0 0 4px #000; }
+        .char-hair { width: 52px; height: 26px; top: 8px; left: 9px; z-index: 2; }
+        .char-body { width: 36px; height: 36px; top: 60px; left: 17px; box-shadow: inset 0 0 0 4px #000; z-index: 1; }
+        .flower { display: none; position: absolute; left: -15px; top: 45px; font-size: 1.2rem; z-index: 5; }
+
+        /* ระบบด่านแบ่งสีพื้นหลังตามเวิลด์ */
+        .stage-section {
+            padding: 40px 20px; border-bottom: 4px dashed #333;
+            background-color: #12121f;
+        }
+        .boss-stage { background-color: #241111; }
+        .castle-stage { background-color: #111f11; }
+
+        /* แถบ HP */
+        .hp-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 15px 0; }
+        .hp-bar-bg { width: 180px; height: 20px; background-color: #333; border: 3px solid #fff; }
+        .hp-bar-fill { height: 100%; background-color: #ff3e3e; width: 100%; }
+
+        /* สถานะกวนๆ */
+        .status-badge {
+            display: inline-block; background: #222; border: 2px solid #555;
+            padding: 8px; font-size: 0.5rem; margin: 5px; text-align: left;
+        }
+
+        /* พลุฉลอง */
+        #fireworks {
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            pointer-events:none; z-index:99; display:none;
+        }
+
+        /* การซ่อนหน้าจอ */
+        .screen { display: none; z-index: 10; position: relative; }
+        .active-screen { display: block; }
+
+        /* กรอบรูปคู่สไตล์เรโทรเกม */
+        .photo-frame {
+            border: 4px solid #fff;
+            outline: 4px solid #000;
+            background-color: #222;
+            max-width: 100%;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+            image-rendering: pixelated;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="heart-bg" id="heart-box"></div>
+    <canvas id="fireworks"></canvas>
+
+    <div id="screen-start" class="screen active-screen" style="padding-top: 10vh;">
+        <div class="game-box">
+            <h1 style="font-size: 2rem; margin-bottom: 40px;">BAMBAM<br><span style="color:#ffcc00">QUEST</span></h1>
+            <p style="color: #666; margin-bottom: 50px;">© 2026 PLAYER1 X PLAYER2 CO.</p>
+            <button class="btn-pixel" onclick="playSelectSound(); switchScreen('screen-custom')">[ PRESS START TO LOVE ]</button>
+        </div>
+    </div>
+
+    <div id="screen-custom" class="screen">
+        <h2>SELECT YOUR HEROES</h2>
+        <div class="game-box">
+            <div style="display:flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
+                <div style="background:#1a1a1a; padding:15px; width:220px; border:2px solid #ff3e3e;">
+                    <span style="font-size:0.55rem; color:#ff3e3e;">PLAYER 1 (BAE)</span>
+                    <div class="pixel-avatar"><div id="p1-hair" class="char-hair" style="background:#111;"></div><div id="p1-head" class="char-head" style="background:#f1c27d;"></div><div id="p1-body" class="char-body" style="background:#e74c3c;"></div></div>
+                    <p style="font-size:0.45rem; text-align:left;">
+                        ⚔️ ATK: 99 (บ่นทีหูชา)<br>
+                        ✨ SKILL: กินขนมไร้ขีดจำกัด<br>
+                        💧 WEAK: แพ้คำชม
+                    </p>
+                    <button class="btn-pixel" style="font-size:0.4rem; padding:5px;" onclick="changeStyle('p1','hair')">HAIR</button>
+                    <button class="btn-pixel" style="font-size:0.4rem; padding:5px;" onclick="changeStyle('p1','body')">CLOTH</button>
+                </div>
+                <div style="background:#1a1a1a; padding:15px; width:220px; border:2px solid #ffcc00;">
+                    <span style="font-size:0.55rem; color:#ffcc00;">PLAYER 2 (YOU)</span>
+                    <div class="pixel-avatar p1-animation"><div id="p2-hair" class="char-hair" style="background:#4a3728;"></div><div id="p2-head" class="char-head" style="background:#ffdbac;"></div><div id="p2-body" class="char-body" style="background:#3498db;"></div><div id="p2-flower" class="flower">🌹</div></div>
+                    <p style="font-size:0.45rem; text-align:left;">
+                        🛡️ DEF: 100 (อดทนเก่ง)<br>
+                        ✨ SKILL: ง้อเก่งระดับตำนาน<br>
+                        💧 WEAK: แพ้เมีย & P1
+                    </p>
+                    <button class="btn-pixel" style="font-size:0.4rem; padding:5px;" onclick="changeStyle('p2','hair')">HAIR</button>
+                    <button class="btn-pixel" style="font-size:0.4rem; padding:5px;" onclick="changeStyle('p2','body')">CLOTH</button>
+                </div>
+            </div>
+            <br>
+            <button class="btn-pixel" onclick="playSelectSound(); startWorldMap()">[ LOAD GAME: OUR STORY ]</button>
+        </div>
+    </div>
+
+    <div id="screen-main" class="screen">
+        
+        <div style="position: sticky; top:0; background:#000; padding:10px; border-bottom:4px solid #fff; z-index:100;">
+            <div class="hp-container">
+                <span style="color:#ff3e3e; font-size:0.6rem;">LOVE LEVEL: 99+</span>
+                <div class="hp-bar-bg"><div class="hp-bar-fill"></div></div>
+                <span id="hp-percent" style="font-size:0.6rem; color:#ff3e3e;">999%</span>
+            </div>
+            <div style="display:flex; justify-content:center; flex-wrap:wrap;">
+                <div class="status-badge">💖 STATUS: "ตกหลุมรักซ้ำๆ" (ถาวร)</div>
+                <div class="status-badge">🍗 STATUS: "หิวตลอดเวลา" (หมูอ้วนของเธอ)</div>
+            </div>
+            <div style="display:flex; justify-content:center; gap:20px; scale:0.6; height:70px; margin-top:-10px;">
+                <div id="map-p1" class="pixel-avatar"></div>
+                <div id="map-p2" class="pixel-avatar"></div>
+            </div>
+        </div>
+
+        <div class="stage-section">
+            <h2>STAGE 1: THE BEGINNING 🗺️</h2>
+            <div class="game-box">
+                <p style="color:#ffcc00; font-weight:bold;">[ QUEST LOG: วันแรกที่ได้พบเจอ ]</p>
+                
+                <img src="https://lh3.googleusercontent.com/d/1m21MamIxlgWt6iBmowkaFec02BrUa61Y" class="photo-frame" width="320" alt="Our First Memory">
+                
+                <p>เรื่องราวบทแรกเริ่มขึ้นเมื่อวันที่ <span style="color:#00ff00;">14 มกราคม 2026</span> วันแรกที่เราได้ทำความรู้จักกัน ก่อนที่หัวใจจะพาวาร์ปขยับเลเวลมาสู่การตกลงคบกันในวันที่ <span style="color:#00ff00;">26 มกราคม 2569</span> 🧸</p>
+                <p style="font-size:0.6rem; color:#888;">จากคนแปลกหน้าสองคนในวันนั้น กลายมาเป็นความสุขขนาดยักษ์ของกันและกันในวันนี้</p>
+            </div>
+        </div>
+
+        <div class="stage-section boss-stage">
+            <h2>STAGE 2: BOSS FIGHT 🔥</h2>
+            <div class="game-box" style="background:#200;">
+                <p style="color:#ff3e3e; font-weight:bold;">⚠️ WARNING! WILD BOSSES APPEARED!</p>
+                <div style="font-size:2rem; margin:20px 0;">👾 👿 💀</div>
+                <p style="color:#ff9999;">
+                    • บอส: ความห่างไกล (HP 9999)<br>
+                    • บอส: มนุษย์เมนส์สุดโหด (ATK ดุดัน)<br>
+                    • บอส: ความไม่เข้าใจกันครั้งใหญ่ (Hp 999)<br>
+                </p>
+                <p>ไม่ว่าบอสจะโหดแค่ไหน มีกี่ดราม่าเข้ามา แต่เพราะ Player 1 กับ Player 2 ช่วยกันกด Co-op คอมโบความเข้าใจ สู้ร่วมกันจนล้มบอสได้ทุกรอบ! เก่งมากเจ้าพวกความรัก!</p>
+            </div>
+        </div>
+
+        <div class="stage-section" id="quiz-section">
+            <h2>STAGE 3: LIVE EVENT ❓</h2>
+            <div class="game-box">
+                <p id="quiz-text">กล่องปริศนาเด้งขึ้นมาเผชิญหน้า!<br><span style="color:#ffcc00;">"เราสองคนคบกันมาเป็นเวลาทั้งหมดกี่เดือนแล้ว?"</span></p>
+                <div id="quiz-options">
+                    <button class="btn-pixel" style="display:block; width:100%; margin:10px 0;" onclick="answerQuiz(false)">3 เดือนหรือเปล่านะ?</button>
+                    <button class="btn-pixel" style="display:block; width:100%; margin:10px 0;" onclick="answerQuiz(true)">5 เดือน </button>
+                    <button class="btn-pixel" style="display:block; width:100%; margin:10px 0;" onclick="answerQuiz(false)">คบกันมาทศวรรษนึงแล้วมะ</button>
+                </div>
+                <div id="quiz-success" style="display:none;">
+                    <p style="color:#00ff00; font-size:0.9rem;">✨ CORRECT ANSWER! ✨</p>
+                    <p>Player 2 คุกเข่ามอบดอกไม้แล้ว! (ดูโมเดลที่บาร์ด้านบนสิ ดอกไม้ขึ้นแล้วนะ!)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="stage-section castle-stage">
+            <h2>STAGE 4: CURRENT CASTLE 🏰</h2>
+            <div class="game-box">
+                <p style="color:#ffcc00; font-size:0.9rem;">TIME ELAPSED IN GAME:</p>
+                <div id="timer" style="font-size:0.9rem; margin:20px 0; color:#00ff00;">LOADING CLOCK...</div>
+                <p>สุขสันต์วันครบรอบนะเธอ ขอบคุณที่อยู่ด้วยกันมา ทะเลาะกันบ้าง งอนกันบ้าง แต่ก็ยังจับมือกันไว้เสมอ อยู่เป็นความสุขแบบนี้ไปนานฟเลยเลยนะ รักเธอค่ะ รู้สึกโชคดีตลอดที่ได้รักเธอ 🐶</p>
+            </div>
+        </div>
+
+        <div class="stage-section" style="background:#05050a;">
+            <h2>🏆 ACHIEVEMENTS</h2>
+            <div class="game-box" style="text-align:left;">
+                <p>✅ [ปลดล็อก] ภารกิจ "ทะเลาะกันแต่ยังอยู่ด้วยกัน"</p>
+                <p>✅ [ปลดล็อก] ภารกิจ "คอยใส่ใจกันในทุกๆเรื่อง"</p>
+                <p>✅ [ปลดล็อก] ภารกิจ "อยู่เคียงข้างกันในวันแย่ ๆ" (ถาวร)</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // สร้างระบบเสียงบี๊บ 8-bit อัตโนมัติด้วย Code
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(freq, type, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+        function playSelectSound() { playBeep(600, 'square', 0.15); setTimeout(() => playBeep(900, 'square', 0.2), 80); }
+        function playWinSound() {
+            let notes = [523, 659, 783, 1046];
+            notes.forEach((n, i) => setTimeout(() => playBeep(n, 'sine', 0.3), i * 150));
+        }
+
+        // ปั๊มหัวใจพิกเซลพื้นหลังแบบสุ่ม
+        const heartBox = document.getElementById('heart-box');
+        for (let i = 0; i < 20; i++) {
+            let h = document.createElement('div'); h.className = 'pixel-heart'; h.innerText = '❤';
+            h.style.left = Math.random() * 100 + 'vw'; h.style.animationDelay = Math.random() * 6 + 's';
+            h.style.fontSize = (Math.random() * 15 + 15) + 'px'; heartBox.appendChild(h);
+        }
+
+        // ระบบพาเลทเปลี่ยนสีตัวละคร
+        const palettes = {
+            hair: ['#111111', '#4a3728', '#e67e22', '#f1c40f', '#9b59b6'],
+            body: ['#e74c3c', '#3498db', '#2ecc71', '#ff69b4', '#ffffff', '#9b59b6']
+        };
+        const currentIdx = { p1: { hair: 0, body: 0 }, p2: { hair: 1, body: 1 } };
+        function changeStyle(player, part) {
+            playBeep(400, 'triangle', 0.05);
+            currentIdx[player][part] = (currentIdx[player][part] + 1) % palettes[part].length;
+            document.getElementById(`${player}-${part}`).style.backgroundColor = palettes[part][currentIdx[player][part]];
+        }
+
+        // เปลี่ยนหน้าจอ
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
+            document.getElementById(screenId).classList.add('active-screen');
+            window.scrollTo(0,0);
+        }
+
+        // โคลนตัวละครขึ้นไปด้านบนเพื่อเริ่มเล่นเกมส์
+        function startWorldMap() {
+            document.getElementById('map-p1').innerHTML = document.querySelector('#screen-custom .char-block:nth-child(1) .pixel-avatar' || '').innerHTML;
+            document.getElementById('map-p2').innerHTML = document.querySelector('#screen-custom .char-block:nth-child(2) .pixel-avatar' || '').innerHTML;
+            switchScreen('screen-main');
+            setInterval(updateTimer, 1000); updateTimer();
+        }
+
+        // มินิเกมควิซกู้ชีพ
+        function answerQuiz(isCorrect) {
+            if(isCorrect) {
+                playWinSound();
+                document.getElementById('quiz-options').style.display = 'none';
+                document.getElementById('quiz-success').style.display = 'block';
+                // ปรับโมเดลตัวละคร Player 2 ให้คุกเข่าให้ดอกไม้
+                let mapP2 = document.querySelector('#map-p2');
+                mapP2.style.animation = 'kneel 1s forwards';
+                mapP2.querySelector('.flower').style.display = 'block';
+                startFireworks();
+            } else {
+                playBeep(150, 'sawtooth', 0.4);
+                alert("บู๊วววว! ตอบผิด โดนบอสบ่นหูชาแน่ ลองเลือกใหม่ซิ!");
+            }
+        }
+
+        // จับเวลาความรักตั้งแต่ 26 มกราคม 2569 (2026)
+        const startDate = new Date(2026, 0, 26); 
+        function updateTimer() {
+            const now = new Date(); const diff = now - startDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            document.getElementById('timer').innerHTML = `${days}D ${hours}H ${minutes}M ${seconds}S`;
+            document.getElementById('hp-percent').innerText = (999 + seconds) + '%';
+        }
+
+        // ระบบจุดพลุฉลองแบบคลาสสิคเมื่อตอบถูก
+        const canvas = document.getElementById('fireworks'); const ctx = canvas.getContext('2d');
+        let particles = [];
+        function startFireworks() {
+            canvas.style.display = 'block';
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            for(let i=0; i<8; i++) setTimeout(spawnFirework, i*300);
+            setTimeout(() => { canvas.style.display = 'none'; particles = []; }, 4000);
+            animateFireworks();
+        }
+        function spawnFirework() {
+            let x = Math.random()*canvas.width; let y = Math.random()*canvas.height*0.6 + 100;
+            let colors = ['#ff3e3e','#ffcc00','#00ff00','#3498db','#ff69b4'];
+            let color = colors[Math.floor(Math.random()*colors.length)];
+            for(let i=0; i<40; i++) {
+                let angle = Math.random()*Math.PI*2; let speed = Math.random()*4 + 2;
+                particles.push({x:x, y:y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, alpha:1, color:color});
+            }
+        }
+        function animateFireworks() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            particles.forEach((p,i) => {
+                p.x += p.vx; p.y += p.vy; p.alpha -= 0.015;
+                ctx.fillStyle = p.color; ctx.globalAlpha = p.alpha;
+                ctx.fillRect(p.x, p.y, 4, 4); // พลุเม็ดเหลี่ยมแบบ Pixel
+                if(p.alpha <= 0) particles.splice(i,1);
+            });
+            if(canvas.style.display === 'block') requestAnimationFrame(animateFireworks);
+        }
+    </script>
+</body>
+      </html>
+  
